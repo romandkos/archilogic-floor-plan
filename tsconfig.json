@@ -1,0 +1,13 @@
+{
+  "extends": "./.config/tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noImplicitReturns": false,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@bi-plugin-utils": ["./utils"],
+      "@grafana-common": ["./common"],
+    },
+  }
+}
