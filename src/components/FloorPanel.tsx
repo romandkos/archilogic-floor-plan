@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FloorPlanEngine } from '@archilogic/floor-plan-sdk'
 import { PanelProps } from '@grafana/data'
 
@@ -10,10 +10,10 @@ import { FloorOptions } from '../types'
 interface Props extends PanelProps<FloorOptions> {}
 const HIGHLIGHT_COLOR: [number, number, number] = [100, 200, 100]
 
-let floorPlan: FloorPlanEngine
-let isFloorPlanLoaded = false
-
 export const FloorPanel: React.FC<Props> = props => {
+  const [floorPlan, setFloorPlan] = useState(undefined as FloorPlanEngine | undefined)
+  const [isFloorPlanLoaded, setIsFloorPlanLoaded] = useState(false)
+
   const { id, token, nodeId, colorFrom, colorTo } = props.options
   const { data } = props
   const { ids, values } = getSeries(data)
@@ -21,6 +21,9 @@ export const FloorPanel: React.FC<Props> = props => {
   const gradient = getGradients(colorFrom, colorTo)
 
   function handleInputSourceData() {
+    if (!floorPlan) {
+      return
+    }
     const nodes = getAssetsAndSpaces(floorPlan)
     nodes.forEach((entity: any) => {
       if (ids.includes(entity.id)) {
@@ -33,14 +36,17 @@ export const FloorPanel: React.FC<Props> = props => {
     })
   }
   function handleSpaceId() {
+    if (!floorPlan) {
+      return
+    }
     const node = getNodeById(floorPlan, nodeId)
     if (node) {
       node?.setHighlight({ fill: HIGHLIGHT_COLOR })
     }
   }
   function handleEvents(fpe: FloorPlanEngine) {
-    isFloorPlanLoaded = true
-    floorPlan = fpe
+    setIsFloorPlanLoaded(true)
+    setFloorPlan(fpe)
     handleInputSourceData()
     handleSpaceId()
   }
